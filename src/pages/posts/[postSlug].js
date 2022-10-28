@@ -9,6 +9,8 @@ import styles from "../../styles/Home.module.css";
 export default function Post({ post, site, video }) {
   const { seo } = post;
 
+  console.log(video);
+
   const yoastHead = parse(seo.fullHead);
 
   console.log("post", post, video);
@@ -99,6 +101,7 @@ export async function getStaticProps({ params = {} } = {}) {
 
   let oembed;
 
+  // for video
   if (post.video) {
     if (post.video.videoSource === "YouTube") {
       oembed = await fetch(

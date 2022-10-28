@@ -20,7 +20,8 @@ export function getApolloClient() {
 export function _createApolloClient() {
   return new ApolloClient({
     link: new HttpLink({
-      uri: process.env.WORDPRESS_GRAPHQL_ENDPOINT,
+      // uri: process.env.WORDPRESS_GRAPHQL_ENDPOINT,
+      uri: "http://next.local/?graphql",
     }),
     cache: new InMemoryCache(),
   });
