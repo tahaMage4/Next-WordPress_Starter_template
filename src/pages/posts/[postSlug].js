@@ -9,11 +9,8 @@ import styles from "../../styles/Home.module.css";
 export default function Post({ post, site, video }) {
   const { seo } = post;
 
-  console.log(video);
-
   const yoastHead = parse(seo.fullHead);
 
-  console.log("post", post, video);
   return (
     <div className={styles.container}>
       <Head>
@@ -56,28 +53,13 @@ export default function Post({ post, site, video }) {
 export async function getStaticProps({ params = {} } = {}) {
   const { postSlug } = params;
 
-  const apolloClient = getApolloClient();
+  const client = getApolloClient();
 
-  const data = await apolloClient.query({
+  const data = await client.query({
     query: gql`
-      query PostBySlug($slug: String!) {
+      query PagetBySlug($slug: String) {
         generalSettings {
           title
-        }
-        postBy(slug: $slug) {
-          id
-          content
-          title
-          slug
-          video {
-            videoSource
-            videoUrl
-          }
-          seo {
-            metaDesc
-            title
-            fullHead
-          }
         }
       }
     `,
@@ -86,46 +68,44 @@ export async function getStaticProps({ params = {} } = {}) {
     },
   });
 
-  const post = data?.data.postBy;
-
-  if (!post) {
-    return {
-      props: {},
-      notFound: true,
-    };
-  }
-
-  const site = {
-    ...data?.data.generalSettings,
-  };
-
-  let oembed;
-
-  // for video
-  if (post.video) {
-    if (post.video.videoSource === "YouTube") {
-      oembed = await fetch(
-        "https://youtube.com/oembed?url=${post.video.videoUrl}"
-      );
-      oembed = await oembed.json();
-    }
-  }
+  console.log(data);
 
   return {
-    props: {
-      post,
-      site,
-      video: {
-        ...post.video,
-        oembed,
-      },
-    },
+    props: {},
   };
 }
 
 export async function getStaticPaths() {
+  const client = getApolloClient();
+
+  const data = await client.query({
+    query: gql`
+    query PostsPage(){
+      posts {
+      edges {
+      node {
+        id
+        title
+        date
+        seo {
+          metaDesc
+          fullHead
+          metaKeywords
+        }
+        video {
+          videoSource
+          videoUrl
+        }
+      }
+    }
+  }
+    }
+    `,
+  });
+  const paths = data.data.posts.edges;
+
   return {
-    paths: [],
-    fallback: "blocking",
+    paths,
+    fallback: false,
   };
 }

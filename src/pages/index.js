@@ -9,8 +9,6 @@ import Layout from "Compontent/Layout";
 
 export default function Home({ page, posts }) {
   const { title, description } = page;
-  console.log(page);
-  console.log("data", title, description);
   return (
     <Layout>
       <div className={styles.container}>
@@ -63,16 +61,16 @@ export default function Home({ page, posts }) {
 }
 
 export async function getStaticProps() {
-  const apolloClient = getApolloClient();
+  const client = getApolloClient();
 
-  const data = await apolloClient.query({
+  const data = await client.query({
     query: gql`
       {
         generalSettings {
           title
           description
         }
-        posts(first: 10000) {
+        posts(first: 6) {
           edges {
             node {
               id
@@ -102,7 +100,6 @@ export async function getStaticProps() {
   const page = {
     ...data?.data.generalSettings,
   };
-  console.log("page", page);
 
   return {
     props: {
